@@ -10,7 +10,7 @@ security and reconnaissance.
 ## Features
 
 - ⚡ Multi-threaded scanning for speed (configurable thread count)
-- 🔎 Service detection for 25+ common ports (SSH, HTTP, MySQL, RDP, …)
+- 🔎 Service detection for 30+ common ports (SSH, HTTP, MySQL, RDP, LDAP, WinRM, …)
 - 🏷️ Banner grabbing to fingerprint running services
 - 🎯 Flexible port ranges — single ports, lists, or ranges
 - 💾 Save results to JSON or CSV for reports
@@ -46,6 +46,14 @@ python3 port_scanner.py 192.168.1.1 -o report.csv
 | `-t, --threads` | Number of worker threads | `100` |
 | `--timeout` | Connection timeout (seconds) | `0.5` |
 | `-o, --output` | Save results to `.json` or `.csv` | — |
+
+## Running the tests
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+The tests start a tiny local server, so they need no network access.
 
 ## Example output
 
