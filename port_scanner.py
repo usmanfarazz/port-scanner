@@ -9,6 +9,9 @@ Author: Usman Faraz (https://github.com/usmanfarazz)
 """
 
 import argparse
+import csv
+import json
+import os
 import socket
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -58,6 +61,30 @@ def parse_ports(spec: str):
     return sorted(p for p in ports if 0 < p < 65536)
 
 
+def save_results(path: str, host: str, target_ip: str, ports_scanned: int,
+                 started: datetime, results: list):
+    """Write results to .json or .csv, picked from the file extension."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".json":
+        report = {
+            "host": host,
+            "ip": target_ip,
+            "started": started.isoformat(timespec="seconds"),
+            "ports_scanned": ports_scanned,
+            "open_ports": results,
+        }
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(report, fh, indent=2)
+    elif ext == ".csv":
+        with open(path, "w", newline="", encoding="utf-8") as fh:
+            writer = csv.DictWriter(fh, fieldnames=["host", "ip", "port", "service", "banner"])
+            writer.writeheader()
+            for r in results:
+                writer.writerow({"host": host, "ip": target_ip, **r})
+    else:
+        raise ValueError("output file must end in .json or .csv")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Multi-threaded TCP port scanner with service detection."
@@ -69,7 +96,12 @@ def main():
                         help="Number of worker threads (default: 100)")
     parser.add_argument("--timeout", type=float, default=0.5,
                         help="Connection timeout in seconds (default: 0.5)")
+    parser.add_argument("-o", "--output",
+                        help="Save results to a file: report.json or report.csv")
     args = parser.parse_args()
+
+    if args.output and os.path.splitext(args.output)[1].lower() not in (".json", ".csv"):
+        sys.exit("[!] --output must end in .json or .csv")
 
     try:
         target_ip = socket.gethostbyname(args.host)
@@ -77,8 +109,9 @@ def main():
         sys.exit(f"[!] Could not resolve host: {args.host}")
 
     ports = parse_ports(args.ports)
+    started = datetime.now()
     print(f"[*] Scanning {args.host} ({target_ip})")
-    print(f"[*] {len(ports)} ports | {args.threads} threads | started {datetime.now():%H:%M:%S}\n")
+    print(f"[*] {len(ports)} ports | {args.threads} threads | started {started:%H:%M:%S}\n")
 
     open_ports = []
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
@@ -88,15 +121,20 @@ def main():
             if result:
                 open_ports.append(result)
 
+    open_ports.sort(key=lambda x: x["port"])
+
     if not open_ports:
         print("[-] No open ports found.")
-        return
+    else:
+        print(f"{'PORT':<8}{'SERVICE':<14}BANNER")
+        print("-" * 50)
+        for r in open_ports:
+            print(f"{r['port']:<8}{r['service']:<14}{r['banner']}")
+        print(f"\n[+] Done. {len(open_ports)} open port(s) found.")
 
-    print(f"{'PORT':<8}{'SERVICE':<14}BANNER")
-    print("-" * 50)
-    for r in sorted(open_ports, key=lambda x: x["port"]):
-        print(f"{r['port']:<8}{r['service']:<14}{r['banner']}")
-    print(f"\n[+] Done. {len(open_ports)} open port(s) found.")
+    if args.output:
+        save_results(args.output, args.host, target_ip, len(ports), started, open_ports)
+        print(f"[+] Results saved to {args.output}")
 
 
 if __name__ == "__main__":
