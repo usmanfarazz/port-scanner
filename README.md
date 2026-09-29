@@ -13,6 +13,7 @@ security and reconnaissance.
 - 🔎 Service detection for 25+ common ports (SSH, HTTP, MySQL, RDP, …)
 - 🏷️ Banner grabbing to fingerprint running services
 - 🎯 Flexible port ranges — single ports, lists, or ranges
+- 💾 Save results to JSON or CSV for reports
 - 🐍 No dependencies — uses only the Python standard library
 
 ## Requirements
@@ -30,6 +31,10 @@ python3 port_scanner.py 192.168.1.1 -p 22,80,443
 
 # Scan a range with more threads
 python3 port_scanner.py 10.0.0.5 -p 1-5000 -t 200
+
+# Save the results for a report
+python3 port_scanner.py 192.168.1.1 -o report.json
+python3 port_scanner.py 192.168.1.1 -o report.csv
 ```
 
 ### Options
@@ -40,6 +45,7 @@ python3 port_scanner.py 10.0.0.5 -p 1-5000 -t 200
 | `-p, --ports` | Ports to scan (`22,80` or `1-1024`) | `1-1024` |
 | `-t, --threads` | Number of worker threads | `100` |
 | `--timeout` | Connection timeout (seconds) | `0.5` |
+| `-o, --output` | Save results to `.json` or `.csv` | — |
 
 ## Example output
 
@@ -58,7 +64,7 @@ PORT    SERVICE       BANNER
 ## Roadmap
 
 - [ ] UDP scanning
-- [ ] Export results to JSON / CSV
+- [x] Export results to JSON / CSV
 - [ ] Basic OS fingerprinting
 
 ## License
