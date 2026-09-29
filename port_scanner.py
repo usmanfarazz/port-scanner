@@ -25,6 +25,9 @@ COMMON_SERVICES = {
     1433: "MSSQL", 1521: "Oracle", 3306: "MySQL", 3389: "RDP",
     5432: "PostgreSQL", 5900: "VNC", 6379: "Redis", 8080: "HTTP-Proxy",
     8443: "HTTPS-Alt", 27017: "MongoDB",
+    # extra services often seen in labs and CTFs
+    88: "Kerberos", 389: "LDAP", 636: "LDAPS", 873: "rsync", 2049: "NFS",
+    5985: "WinRM", 5986: "WinRM-HTTPS", 9200: "Elasticsearch", 11211: "Memcached",
 }
 
 

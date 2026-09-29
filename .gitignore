@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+# scan reports can contain sensitive target info; keep them out of git
+*.json
+*.csv
