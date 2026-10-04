@@ -56,11 +56,14 @@ def parse_ports(spec: str):
     ports = set()
     for part in spec.split(","):
         part = part.strip()
-        if "-" in part:
-            start, end = part.split("-", 1)
-            ports.update(range(int(start), int(end) + 1))
-        elif part:
-            ports.add(int(part))
+        try:
+            if "-" in part:
+                start, end = part.split("-", 1)
+                ports.update(range(int(start), int(end) + 1))
+            elif part:
+                ports.add(int(part))
+        except ValueError:
+            raise ValueError(f"invalid port or range: '{part}'") from None
     return sorted(p for p in ports if 0 < p < 65536)
 
 
@@ -111,7 +114,10 @@ def main():
     except socket.gaierror:
         sys.exit(f"[!] Could not resolve host: {args.host}")
 
-    ports = parse_ports(args.ports)
+    try:
+        ports = parse_ports(args.ports)
+    except ValueError as exc:
+        sys.exit(f"[!] {exc}")
     started = datetime.now()
     print(f"[*] Scanning {args.host} ({target_ip})")
     print(f"[*] {len(ports)} ports | {args.threads} threads | started {started:%H:%M:%S}\n")

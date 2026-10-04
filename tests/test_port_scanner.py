@@ -20,6 +20,10 @@ class ParsePortsTest(unittest.TestCase):
     def test_duplicates_removed_and_sorted(self):
         self.assertEqual(ps.parse_ports("443,22,22,80"), [22, 80, 443])
 
+    def test_invalid_spec_gives_clear_error(self):
+        with self.assertRaisesRegex(ValueError, "invalid port or range: 'abc'"):
+            ps.parse_ports("22,abc")
+
     def test_out_of_range_ports_dropped(self):
         self.assertEqual(ps.parse_ports("0,1,65535,65536"), [1, 65535])
 
