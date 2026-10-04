@@ -3,6 +3,7 @@ import csv
 import json
 import os
 import socket
+import subprocess
 import sys
 import tempfile
 import threading
@@ -89,6 +90,28 @@ class SaveResultsTest(unittest.TestCase):
     def test_bad_extension_rejected(self):
         with self.assertRaises(ValueError):
             ps.save_results("r.txt", "h", "1.1.1.1", 1, datetime.now(), [])
+
+
+SCRIPT = os.path.join(os.path.dirname(__file__), "..", "port_scanner.py")
+
+
+class CommandLineTest(unittest.TestCase):
+    def run_cli(self, *args):
+        return subprocess.run([sys.executable, SCRIPT, *args],
+                              capture_output=True, text=True, timeout=60)
+
+    def test_common_scans_service_ports(self):
+        out = self.run_cli("127.0.0.1", "--common", "--timeout", "0.2").stdout
+        self.assertIn(f"{len(ps.COMMON_SERVICES)} ports", out)
+
+    def test_bad_threads_rejected(self):
+        res = self.run_cli("127.0.0.1", "-t", "0")
+        self.assertNotEqual(res.returncode, 0)
+        self.assertIn("--threads must be at least 1", res.stderr)
+
+    def test_bad_port_spec_rejected(self):
+        res = self.run_cli("127.0.0.1", "-p", "abc")
+        self.assertIn("invalid port or range", res.stderr)
 
 
 if __name__ == "__main__":
