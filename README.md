@@ -47,6 +47,10 @@ python3 port_scanner.py 192.168.1.1 -o report.csv
 | `--timeout` | Connection timeout (seconds) | `0.5` |
 | `-o, --output` | Save results to `.json` or `.csv` | — |
 
+Port lists can mix single ports and ranges, e.g. `-p 22,80,8000-8100`.
+A reversed range like `90-80` is read as `80-90`. Invalid input (`-p abc`,
+`-t 0`, `--timeout 0`) is rejected with a clear message before scanning starts.
+
 ## Running the tests
 
 ```bash
