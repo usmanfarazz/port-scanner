@@ -58,8 +58,8 @@ def parse_ports(spec: str):
         part = part.strip()
         try:
             if "-" in part:
-                start, end = part.split("-", 1)
-                ports.update(range(int(start), int(end) + 1))
+                start, end = sorted(int(x) for x in part.split("-", 1))
+                ports.update(range(start, end + 1))
             elif part:
                 ports.add(int(part))
         except ValueError:
