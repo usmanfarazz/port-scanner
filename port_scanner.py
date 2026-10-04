@@ -161,3 +161,7 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         sys.exit("\n[!] Scan interrupted by user.")
+    except BrokenPipeError:
+        # Output was piped into something like `head` that closed early.
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        sys.exit(0)
