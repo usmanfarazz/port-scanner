@@ -135,15 +135,16 @@ def main():
                 open_ports.append(result)
 
     open_ports.sort(key=lambda x: x["port"])
+    elapsed = (datetime.now() - started).total_seconds()
 
     if not open_ports:
-        print("[-] No open ports found.")
+        print(f"[-] No open ports found ({elapsed:.1f}s).")
     else:
         print(f"{'PORT':<8}{'SERVICE':<14}BANNER")
         print("-" * 50)
         for r in open_ports:
             print(f"{r['port']:<8}{r['service']:<14}{r['banner']}")
-        print(f"\n[+] Done. {len(open_ports)} open port(s) found.")
+        print(f"\n[+] Done in {elapsed:.1f}s. {len(open_ports)} open port(s) found.")
 
     if args.output:
         save_results(args.output, args.host, target_ip, len(ports), started, open_ports)
