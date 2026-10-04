@@ -98,6 +98,8 @@ def main():
     parser.add_argument("host", help="Target hostname or IP address")
     parser.add_argument("-p", "--ports", default="1-1024",
                         help="Ports to scan, e.g. '22,80,443' or '1-1024' (default: 1-1024)")
+    parser.add_argument("--common", action="store_true",
+                        help="Scan only the well-known service ports this tool recognises (fast first look)")
     parser.add_argument("-t", "--threads", type=int, default=100,
                         help="Number of worker threads (default: 100)")
     parser.add_argument("--timeout", type=float, default=0.5,
@@ -118,10 +120,13 @@ def main():
     except socket.gaierror:
         sys.exit(f"[!] Could not resolve host: {args.host}")
 
-    try:
-        ports = parse_ports(args.ports)
-    except ValueError as exc:
-        sys.exit(f"[!] {exc}")
+    if args.common:
+        ports = sorted(COMMON_SERVICES)
+    else:
+        try:
+            ports = parse_ports(args.ports)
+        except ValueError as exc:
+            sys.exit(f"[!] {exc}")
     started = datetime.now()
     print(f"[*] Scanning {args.host} ({target_ip})")
     print(f"[*] {len(ports)} ports | {args.threads} threads | started {started:%H:%M:%S}\n")

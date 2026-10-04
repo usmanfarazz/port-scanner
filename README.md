@@ -26,6 +26,9 @@ security and reconnaissance.
 # Scan the top 1024 ports (default)
 python3 port_scanner.py scanme.nmap.org
 
+# Quick first look: only well-known service ports
+python3 port_scanner.py 192.168.1.1 --common
+
 # Scan specific ports
 python3 port_scanner.py 192.168.1.1 -p 22,80,443
 
@@ -43,6 +46,7 @@ python3 port_scanner.py 192.168.1.1 -o report.csv
 |------|-------------|---------|
 | `host` | Target hostname or IP | required |
 | `-p, --ports` | Ports to scan (`22,80` or `1-1024`) | `1-1024` |
+| `--common` | Scan only the well-known service ports (fast first look) | off |
 | `-t, --threads` | Number of worker threads | `100` |
 | `--timeout` | Connection timeout (seconds) | `0.5` |
 | `-o, --output` | Save results to `.json` or `.csv` | — |
