@@ -106,6 +106,10 @@ def main():
                         help="Save results to a file: report.json or report.csv")
     args = parser.parse_args()
 
+    if args.threads < 1:
+        sys.exit("[!] --threads must be at least 1")
+    if args.timeout <= 0:
+        sys.exit("[!] --timeout must be greater than 0")
     if args.output and os.path.splitext(args.output)[1].lower() not in (".json", ".csv"):
         sys.exit("[!] --output must end in .json or .csv")
 
